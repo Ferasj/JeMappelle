@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.AddNewNameFragment">
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.MaterialComponents.Toolbar.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/toolbar_cancle_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/add_new_name_cancel_button"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_pink"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="@string/add_new_name"
+                android:textColor="@color/purple_text"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="15dp"
+                android:text="@string/add_new_name_placeholder_name"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/enter_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/outlined_search_bar"
+                android:hint="@string/add_new_name_edit_text_enter_name_hint"
+                android:inputType="text|textCapWords"
+                android:maxLines="1"
+                android:minHeight="48dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/add_new_name_placeholder_tags"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+
+<!--            <EditText-->
+<!--                android:id="@+id/enter_tags"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="20dp"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:layout_marginEnd="16dp"-->
+<!--                android:background="@drawable/outlined_search_bar"-->
+<!--                android:hint="@string/add_new_name_edit_text_enter_tags_collections"-->
+<!--                android:inputType="textCapSentences"-->
+<!--                android:maxLines="1"-->
+<!--                android:minHeight="48dp"-->
+<!--                android:paddingStart="10dp"-->
+<!--                android:paddingEnd="10dp" />-->
+
+            <AutoCompleteTextView
+                android:id="@+id/enter_tags"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:completionThreshold="1"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/outlined_search_bar"
+                android:hint="@string/add_new_name_edit_text_enter_tags_collections"
+                android:inputType="textCapSentences"
+                android:maxLines="1"
+                android:minHeight="48dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                />
+
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tag_chips_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="40dp"
+                android:paddingTop="30dp"
+                android:paddingEnd="40dp"
+                android:text="@string/add_new_name_placeholder_notes"
+                android:textSize="30sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/enter_notes"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/outlined_search_bar"
+                android:gravity="start"
+                android:hint="@string/add_new_name_edit_text_enter_notes"
+                android:inputType="textCapSentences|textMultiLine"
+                android:minHeight="150dp"
+                android:paddingStart="10dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="10dp" />
+
+            <Button
+                android:id="@+id/create_name_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="30dp"
+                android:minHeight="60dp"
+                android:text="@string/add_new_name_button_text"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

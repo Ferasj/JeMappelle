@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+
+<!--  <files-path name="names_csv_files" path="."/>-->
+<files-path
+    name="names_csv_files"
+    path="/Download/"/>
+
+
+  <external-path
+      name="names_csv_files"
+      path="/Download/"/>
+</paths>

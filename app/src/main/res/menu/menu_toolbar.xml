@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/ic_export"
+        android:title="@string/export_menu"
+        app:showAsAction="ifRoom">
+
+        <menu>
+
+            <item
+                android:id="@+id/export_names_csv"
+                android:orderInCategory="1"
+                android:title="@string/export_names_to_csv"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/export_tags_csv"
+                android:orderInCategory="2"
+                android:title="@string/export_tags_to_csv"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/export_names_with_tags_csv"
+                android:orderInCategory="3"
+                android:title="@string/export_names_with_tags_list_to_csv"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/export_relationship_to_csv"
+                android:orderInCategory="3"
+                android:title="@string/export_relationship_table_to_csv"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+    <item
+        android:icon="@drawable/ic_sort"
+        android:title="@string/sort_menu"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/sort_name_asc"
+                android:title="@string/sort_by_name_ascending"
+                android:orderInCategory="1"
+                android:icon="@drawable/ic_up_arrow"
+                app:showAsAction="ifRoom"/>
+
+            <item
+                android:id="@+id/sort_name_des"
+                android:title="@string/sort_by_name_descending"
+                android:orderInCategory="2"
+                android:icon="@drawable/ic_down_arrow"
+                app:showAsAction="ifRoom"/>
+
+            <item
+                android:id="@+id/sort_date_added_asc"
+                android:title="@string/sort_by_date_added_ascending"
+                android:orderInCategory="3"
+                android:icon="@drawable/ic_up_arrow"
+                app:showAsAction="ifRoom"/>
+
+            <item
+                android:id="@+id/sort_date_added_des"
+                android:title="@string/sort_by_date_descending"
+                android:orderInCategory="4"
+                android:icon="@drawable/ic_down_arrow"
+                app:showAsAction="ifRoom"/>
+
+        </menu>
+    </item>
+
+
+</menu>
