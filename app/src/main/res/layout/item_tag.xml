@@ -7,7 +7,7 @@
     android:layout_marginHorizontal="5dp"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
-    android:background="@dark_green"
+    android:background="@color/dark_green"
     app:cardCornerRadius="10dp">
 
     <TextView
