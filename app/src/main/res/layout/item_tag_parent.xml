@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/dark_green"
         android:orientation="horizontal">
 
         <TextView
@@ -20,6 +21,7 @@
             tools:text="Placeholder text"
             android:layout_marginHorizontal="5dp"
             android:paddingVertical="10dp"
+            android:textColor="@color/white"
             android:textStyle="bold"
             android:textSize="20sp"/>
 
