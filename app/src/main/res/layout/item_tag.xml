@@ -7,6 +7,7 @@
     android:layout_marginHorizontal="5dp"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
+    android:background="@dark_green"
     app:cardCornerRadius="10dp">
 
     <TextView
@@ -16,6 +17,7 @@
         android:paddingVertical="5dp"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
+        android:textColor="@color/white"
         android:textSize="15sp"
         android:textStyle="bold"
         tools:text="Tag text" />

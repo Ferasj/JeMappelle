@@ -4,11 +4,20 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/ic_add.xml" value="0.1" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/ic_back_arrow.xml" value="0.1525" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1525" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/ic_people.xml" value="0.1" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/ic_up_arrow.xml" value="0.1525" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/drawable/menu_bottom_shadow.xml" value="0.1" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/fragment_add_new_name.xml" value="0.1" />
-        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/fragment_names_list.xml" value="0.1" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/fragment_all_names_with_tag.xml" value="0.15052083333333333" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/fragment_name_details.xml" value="0.15052083333333333" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/fragment_names_list.xml" value="0.16666666666666666" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/item_all_names_with_tag.xml" value="0.4466666666666667" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/item_name.xml" value="0.2447418738049713" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/item_tag.xml" value="0.13903985507246377" />
+        <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/layout/item_tag_parent.xml" value="0.13903985507246377" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/menu/menu_bottom.xml" value="0.11481481481481481" />
         <entry key="..\:/onedrivee/OneDrive/Professional/Personal Projects/remembering people app/PeopleRemembering-send-to/app/src/main/res/menu/menu_toolbar.xml" value="0.11481481481481481" />
         <entry key="app/src/main/res/drawable/menu_bottom_shadow.xml" value="0.1" />
