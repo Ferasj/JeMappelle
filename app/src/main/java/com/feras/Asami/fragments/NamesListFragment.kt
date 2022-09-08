@@ -4,14 +4,15 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.feras.Asami.MainActivity
 import com.feras.Asami.R
 import com.feras.Asami.adapters.NameItemAdapter
@@ -50,7 +51,9 @@ class NamesListFragment : Fragment() {
 
     private val SHARED_PREFS = "sharedPrefs"
     private val SORT_KEY = "sortBy"
+    private val REC_POSITION_KEY = "recPosition"
 
+    private var positionOnRec = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,6 +82,7 @@ class NamesListFragment : Fragment() {
             name.dateAdded = getTodayDate()
             name.dateModified = getTodayDate()
             viewModel.insertName(name)
+            resetRecPosition()
             findNavController().navigate(R.id.action_namesListFragment_to_addNewNameFragment)
         }
 
@@ -102,6 +106,7 @@ class NamesListFragment : Fragment() {
             viewModel.getAllSortedBy(sortKey).observe(viewLifecycleOwner, Observer {
                 if (binding.searchBar.text.toString() == "")
                     adapter.data = it
+                binding.namesRecView.scrollToPosition(positionOnRec)
             })
         })
 
@@ -122,12 +127,11 @@ class NamesListFragment : Fragment() {
                                                         val listOne : MutableList<NameWithTags> = it as MutableList<NameWithTags>
                                                         val listTwo : MutableList<NameWithTags> = first as MutableList<NameWithTags>
 
-
                                                         val listToShow = listOne
                                                         listToShow.addAll(listTwo)
 
-
                                                         adapter.data = listToShow
+                                                        binding.namesRecView.scrollToPosition(positionOnRec)
 
                                                     })
 
@@ -140,6 +144,7 @@ class NamesListFragment : Fragment() {
                         viewModel.getAllSortedBy(sortBy.value!!)
                             .observe(viewLifecycleOwner, Observer {
                                 adapter.data = it
+                                binding.namesRecView.scrollToPosition(positionOnRec)
                             })
                     }
                 }
@@ -165,10 +170,39 @@ class NamesListFragment : Fragment() {
             listOfRelationships = it
         })
 
+        binding.namesRecView.scrollToPosition(positionOnRec)
 
         return view
     }
 
+    override fun onPause() {
+        saveRecPosition()
+        super.onPause()
+    }
+
+    fun saveRecPosition(){
+        val sharedPreferences =
+            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val position =
+            (binding.namesRecView.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+
+        editor.putInt(REC_POSITION_KEY, position)
+        editor.apply()
+    }
+
+    fun resetRecPosition(){
+        val sharedPreferences =
+            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+
+        val position =
+            (binding.namesRecView.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
+
+        editor.putInt(REC_POSITION_KEY, 0)
+        editor.apply()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_toolbar, menu)
@@ -352,10 +386,12 @@ class NamesListFragment : Fragment() {
         val sharedPreferences =
             this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
+        positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        resetRecPosition()
         _binding = null
     }
 
