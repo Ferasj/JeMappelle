@@ -118,7 +118,16 @@ class NamesListFragment : Fragment() {
                                             .observe(viewLifecycleOwner, Observer {third->
                                                 viewModel.checkForStart(third, text.toString())
                                                     .observe(viewLifecycleOwner, Observer {
-                                                        adapter.data = it
+
+                                                        val listOne : MutableList<NameWithTags> = it as MutableList<NameWithTags>
+                                                        val listTwo : MutableList<NameWithTags> = first as MutableList<NameWithTags>
+
+
+                                                        val listToShow = listOne
+                                                        listToShow.addAll(listTwo)
+
+
+                                                        adapter.data = listToShow
 
                                                     })
 
