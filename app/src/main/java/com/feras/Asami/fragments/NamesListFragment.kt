@@ -112,6 +112,25 @@ class NamesListFragment : Fragment() {
 
 
         binding.searchBar.doOnTextChanged { text, start, before, count ->
+            if (text != null && text.isNotEmpty()) {
+                viewModel.searchNamesByKeyword(text.toString())
+                    .observe(viewLifecycleOwner, Observer { results ->
+                        adapter.data = results
+                        binding.namesRecView.scrollToPosition(positionOnRec)
+                    })
+            }
+                else {
+                    viewModel.getAllSortedBy(sortBy.value!!)
+                        .observe(viewLifecycleOwner, Observer {
+                            adapter.data = it
+                            binding.namesRecView.scrollToPosition(positionOnRec)
+                        })
+                }
+            }
+
+
+/*
+        binding.searchBar.doOnTextChanged { text, start, before, count ->
             if (text != null) {
                 if (text != "") {
                     if (text.length > 0) {
@@ -140,6 +159,9 @@ class NamesListFragment : Fragment() {
 
                             })
                     }
+
+
+
                     if (binding.searchBar.text.toString().isEmpty()) {
                         viewModel.getAllSortedBy(sortBy.value!!)
                             .observe(viewLifecycleOwner, Observer {
@@ -151,7 +173,7 @@ class NamesListFragment : Fragment() {
 
             }
         }
-
+*/
 
         viewModel.namesWithTags.observe(viewLifecycleOwner, Observer {
             listOfNamesWithTags = it

@@ -78,9 +78,13 @@ class NamesListViewModel(private val dao: NamesDao, sortBy: String) : ViewModel(
         return returnList
     }
 
-    fun searchName(name: String) : LiveData<List<NameWithTags>>{
-        return dao.getNamesByName(name)
+    fun searchNamesByKeyword(keyword: String) : LiveData<List<NameWithTags>>{
+        return dao.searchNamesByKeyword(keyword)
     }
+
+    //fun searchName(name: String) : LiveData<List<NameWithTags>>{
+    //    return dao.getNamesByName(name)
+    //}
 
     fun searchNameWithTag(tagName : String) : LiveData<List<NameWithTags>>{
         return dao.getNameWithTagsByTagName(tagName)

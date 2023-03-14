@@ -119,6 +119,10 @@ interface NamesDao {
 
 
 
+    @Query("SELECT names_table.* FROM names_table WHERE name LIKE '%'||:keyword||'%' OR notes LIKE '%'||:keyword||'%' UNION SELECT names_table.* FROM names_table JOIN tagInName_table ON names_table.nameId = tagInName_table.nameId JOIN tags_table ON tagInName_table.tagId = tags_table.tagId WHERE tags_table.tag_name LIKE '%'||:keyword||'%'")
+    @Transaction
+    fun searchNamesByKeyword(keyword: String): LiveData<List<NameWithTags>>
+
 
 
 
