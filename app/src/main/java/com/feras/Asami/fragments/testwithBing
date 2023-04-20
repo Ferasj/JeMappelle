@@ -59,8 +59,8 @@ class NamesListFragment : Fragment() {
 
     private var positionOnRec = 0
     private var mScrollY = 0
-/*
-    recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+
+    homeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             private var mScrollY = 0
 
@@ -68,7 +68,7 @@ class NamesListFragment : Fragment() {
             mScrollY += dy
         }
     })
-*/
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -208,6 +208,7 @@ class NamesListFragment : Fragment() {
         })
 
         binding.namesRecView.scrollToPosition(positionOnRec)
+
 
         return view // create the view hierarchy associated with the fragment.
     }
