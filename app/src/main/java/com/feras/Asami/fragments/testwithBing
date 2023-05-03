@@ -33,6 +33,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 //added by Bing
+import android.os.Parcelable
+import android.os.Parcel
+import android.util.Base64
+
+
 import androidx.recyclerview.widget.RecyclerView
 
 
@@ -227,10 +232,18 @@ class NamesListFragment : Fragment() {
         binding.namesRecView.scrollToPosition(positionOnRec)
     }
 */
-    override fun onPause() {
-        super.onPause()
-        scrollState = binding.namesRecView.layoutManager?.onSaveInstanceState()
+override fun onPause() {
+    super.onPause()
+    val scrollState = binding.namesRecView.layoutManager?.onSaveInstanceState()
+    if (scrollState != null) {
+        val parcel = Parcel.obtain()
+        scrollState.writeToParcel(parcel, 0)
+        val bytes = parcel.marshall()
+        val encoded = Base64.encodeToString(bytes, 0)
+        val sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+        sharedPreferences.edit().putString("scroll_state", encoded).apply()
     }
+}
 
 
 
@@ -459,9 +472,24 @@ class NamesListFragment : Fragment() {
     private fun loadData() {
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+
+        val encoded = sharedPreferences.getString("scroll_state", null)
+        if (encoded != null) {
+            val bytes = Base64.decode(encoded, 0)
+            val parcel = Parcel.obtain()
+            parcel.unmarshall(bytes, 0, bytes.size)
+            parcel.setDataPosition(0)
+            val scrollState = RecyclerView.LayoutManager.SavedState.CREATOR.createFromParcel(parcel)
+            binding.namesRecView.layoutManager?.onRestoreInstanceState(scrollState)
+        }
     }
+
+        //sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
+        //positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+
 
     override fun onDestroyView() {
         super.onDestroyView()
