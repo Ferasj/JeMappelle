@@ -59,6 +59,7 @@ class NamesListFragment : Fragment() {
 
     private var positionOnRec = 0
     private var mScrollY = 0
+    private var scrollState: Parcelable? = null
 
 
 
@@ -203,6 +204,7 @@ class NamesListFragment : Fragment() {
         // I'm graying this line because I have added it to onResume.
         //binding.namesRecView.scrollToPosition(positionOnRec)
 
+        /*
         binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -213,18 +215,22 @@ class NamesListFragment : Fragment() {
                 editor.apply()
             }
         })
-
+*/
 
         return view // create the view hierarchy associated with the fragment.
     }
 
+/*
     override fun onResume() {
         super.onResume()
         loadData()
         binding.namesRecView.scrollToPosition(positionOnRec)
     }
-
-
+*/
+    override fun onPause() {
+        super.onPause()
+        scrollState = binding.namesRecView.layoutManager?.onSaveInstanceState()
+    }
 
 
 
