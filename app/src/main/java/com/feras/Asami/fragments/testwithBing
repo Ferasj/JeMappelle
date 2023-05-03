@@ -60,14 +60,6 @@ class NamesListFragment : Fragment() {
     private var positionOnRec = 0
     private var mScrollY = 0
 
-    homeRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            private var mScrollY = 0
-
-            super.onScrolled(recyclerView, dx, dy)
-            mScrollY += dy
-        }
-    })
 
 
     override fun onCreateView(
@@ -77,7 +69,7 @@ class NamesListFragment : Fragment() {
         _binding = FragmentNamesListBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        loadData()
+        //loadData()
 
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
         binding.toolbarTitle.text = "Names"
@@ -117,6 +109,7 @@ class NamesListFragment : Fragment() {
 
         binding.namesRecView.adapter = adapter
 
+        //this part is responsible for the sort functionality
         sortBy.observe(viewLifecycleOwner, Observer { sortKey ->
             viewModel.getAllSortedBy(sortKey).observe(viewLifecycleOwner, Observer {
                 if (binding.searchBar.text.toString() == "")
@@ -125,7 +118,7 @@ class NamesListFragment : Fragment() {
             })
         })
 
-
+        //this part is responsible for the search functionality
         binding.searchBar.doOnTextChanged { text, start, before, count ->
             if (text != null && text.isNotEmpty()) {
                 viewModel.searchNamesByKeyword(text.toString())
@@ -207,17 +200,40 @@ class NamesListFragment : Fragment() {
             listOfRelationships = it
         })
 
-        binding.namesRecView.scrollToPosition(positionOnRec)
+        // I'm graying this line because I have added it to onResume.
+        //binding.namesRecView.scrollToPosition(positionOnRec)
+
+        binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val sharedPreferences = activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                val currentScrollPosition = sharedPreferences.getInt(REC_POSITION_KEY, 0) + dy
+                editor.putInt(REC_POSITION_KEY, currentScrollPosition)
+                editor.apply()
+            }
+        })
 
 
         return view // create the view hierarchy associated with the fragment.
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadData()
+        binding.namesRecView.scrollToPosition(positionOnRec)
     }
 
 
 
 
 
-    /*
+
+
+
+
+
+/*
     override fun onPause() {
         saveRecPosition()
         super.onPause()
@@ -234,25 +250,31 @@ class NamesListFragment : Fragment() {
         editor.putInt(REC_POSITION_KEY, position)
         editor.apply()
     }
+*/
 
     fun resetRecPosition(){
         val sharedPreferences =
-            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         val position =
             (binding.namesRecView.getLayoutManager() as LinearLayoutManager).findFirstCompletelyVisibleItemPosition()
 
-        editor.putInt(REC_POSITION_KEY, position)
+        editor.putInt(REC_POSITION_KEY, 0)
         editor.apply()
     }
 
 
-     */
+
+// The code below is responsbile for exporting the names to a CSV file and the sorting options.
+    // I don't think the code is correct anyway, as there is no value in exporting names alone or tags alone. I need the full database
+
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -298,6 +320,7 @@ class NamesListFragment : Fragment() {
 
         return super.onOptionsItemSelected(item)
     }
+
 
     private fun exportDatabaseToCSVFile(actionId: Int) {
         var fileName = "name" + fileType
@@ -436,7 +459,8 @@ class NamesListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        resetRecPosition()
+        //tryin this to see if it would fix the recyclerview beign reset to zero
+        // resetRecPosition()
         _binding = null
     }
 
