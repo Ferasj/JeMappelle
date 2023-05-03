@@ -32,6 +32,10 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+//added by Bing
+import androidx.recyclerview.widget.RecyclerView
+
+
 
 class NamesListFragment : Fragment() {
     private var _binding: FragmentNamesListBinding? = null
@@ -54,6 +58,9 @@ class NamesListFragment : Fragment() {
     private val REC_POSITION_KEY = "recPosition"
 
     private var positionOnRec = 0
+    private var mScrollY = 0
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,6 +109,7 @@ class NamesListFragment : Fragment() {
 
         binding.namesRecView.adapter = adapter
 
+        //this part is responsible for the sort functionality
         sortBy.observe(viewLifecycleOwner, Observer { sortKey ->
             viewModel.getAllSortedBy(sortKey).observe(viewLifecycleOwner, Observer {
                 if (binding.searchBar.text.toString() == "")
@@ -110,7 +118,7 @@ class NamesListFragment : Fragment() {
             })
         })
 
-
+        //this part is responsible for the search functionality
         binding.searchBar.doOnTextChanged { text, start, before, count ->
             if (text != null && text.isNotEmpty()) {
                 viewModel.searchNamesByKeyword(text.toString())
@@ -194,9 +202,33 @@ class NamesListFragment : Fragment() {
 
         binding.namesRecView.scrollToPosition(positionOnRec)
 
-        return view
+        binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                val sharedPreferences = activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                val currentScrollPosition = sharedPreferences.getInt(REC_POSITION_KEY, 0) + dy
+                editor.putInt(REC_POSITION_KEY, currentScrollPosition)
+                editor.apply()
+            }
+        })
+
+
+        return view // create the view hierarchy associated with the fragment.
     }
 
+
+
+
+
+
+
+
+
+
+
+
+/*
     override fun onPause() {
         saveRecPosition()
         super.onPause()
@@ -213,10 +245,11 @@ class NamesListFragment : Fragment() {
         editor.putInt(REC_POSITION_KEY, position)
         editor.apply()
     }
+*/
 
     fun resetRecPosition(){
         val sharedPreferences =
-            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         val position =
@@ -226,10 +259,18 @@ class NamesListFragment : Fragment() {
         editor.apply()
     }
 
+
+
+// The code below is responsbile for exporting the names to a CSV file. the functions used have been deprecated and are no longer in use
+    // I don't think the code is correct anyway, as there is no value in exporting names alone or tags alone. I need the full database
+    // I'll gray it for now as I can copy the whole database with me when I move from phone to another. I might come later to fix it
+
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -276,6 +317,7 @@ class NamesListFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+
     private fun exportDatabaseToCSVFile(actionId: Int) {
         var fileName = "name" + fileType
         if (actionId == 1) {
@@ -287,10 +329,10 @@ class NamesListFragment : Fragment() {
         } else if (actionId == 4) {
             fileName = "RelationshipCSV" + fileType
         }
-        val csvFile = generateFile(context!!, fileName)
+        val csvFile = generateFile(requireContext(), fileName)
         if (csvFile != null) {
             exportNamesToCSVFile(csvFile, actionId)
-            val intent = goToFileIntent(context!!, csvFile)
+            val intent = goToFileIntent(requireContext(), csvFile)
             try {
                 if (openFileAfterExport) {
                     startActivity(intent)
@@ -383,8 +425,8 @@ class NamesListFragment : Fragment() {
     }
 
     fun showSnackBar(message: String) {
-        Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(ContextCompat.getColor(this.context!!, R.color.blue_dark_700))
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(ContextCompat.getColor(this.requireContext(), R.color.blue_dark_700))
             .show()
     }
 
@@ -397,7 +439,7 @@ class NamesListFragment : Fragment() {
 
     private fun saveData() {
         val sharedPreferences =
-            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         editor.putString(SORT_KEY, sortBy.value)
@@ -406,7 +448,7 @@ class NamesListFragment : Fragment() {
 
     private fun loadData() {
         val sharedPreferences =
-            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
     }

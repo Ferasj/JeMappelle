@@ -50,7 +50,7 @@ class NameDetailsFragment : Fragment() {
         binding.nameDetailsRecView.adapter = adapter
 
         binding.toolbarDeleteButton.setOnClickListener {_->
-            val alert = AlertDialog.Builder(context!!)
+            val alert = AlertDialog.Builder(requireContext())
             alert.setMessage("Are you sure you want to delete?")
             alert.setPositiveButton("Yes", { dialog, which ->
                 viewModel.deleteName(nameId)

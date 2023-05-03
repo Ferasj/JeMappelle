@@ -176,8 +176,8 @@ class AddNewNameFragment : Fragment() {
     }
 
     fun showSnackBar(message : String){
-        Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(ContextCompat.getColor(this.context!!, R.color.blue_dark_700))
+        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.blue_dark_700))
             .show()
     }
 
