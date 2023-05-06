@@ -36,7 +36,7 @@ import java.util.*
 import android.os.Parcelable
 import android.os.Parcel
 import android.util.Base64
-
+import androidx.savedstate.SavedStateRegistryOwner
 
 import androidx.recyclerview.widget.RecyclerView
 
@@ -143,51 +143,7 @@ class NamesListFragment : Fragment() {
             }
 
 
-/*
-        binding.searchBar.doOnTextChanged { text, start, before, count ->
-            if (text != null) {
-                if (text != "") {
-                    if (text.length > 0) {
-                        viewModel.searchName(text.toString())
-                            .observe(viewLifecycleOwner, Observer { first ->
-                                viewModel.searchNameWithTag(text.toString())
-                                    .observe(viewLifecycleOwner, Observer { second ->
-                                        viewModel.format(first, second)
-                                            .observe(viewLifecycleOwner, Observer {third->
-                                                viewModel.checkForStart(third, text.toString())
-                                                    .observe(viewLifecycleOwner, Observer {
 
-                                                        val listOne : MutableList<NameWithTags> = it as MutableList<NameWithTags>
-                                                        val listTwo : MutableList<NameWithTags> = first as MutableList<NameWithTags>
-
-                                                        val listToShow = listOne
-                                                        listToShow.addAll(listTwo)
-
-                                                        adapter.data = listToShow
-                                                        binding.namesRecView.scrollToPosition(positionOnRec)
-
-                                                    })
-
-                                            })
-                                    })
-
-                            })
-                    }
-
-
-
-                    if (binding.searchBar.text.toString().isEmpty()) {
-                        viewModel.getAllSortedBy(sortBy.value!!)
-                            .observe(viewLifecycleOwner, Observer {
-                                adapter.data = it
-                                binding.namesRecView.scrollToPosition(positionOnRec)
-                            })
-                    }
-                }
-
-            }
-        }
-*/
 
         viewModel.namesWithTags.observe(viewLifecycleOwner, Observer {
             listOfNamesWithTags = it
@@ -206,10 +162,10 @@ class NamesListFragment : Fragment() {
             listOfRelationships = it
         })
 
-        // I'm graying this line because I have added it to onResume.
-        //binding.namesRecView.scrollToPosition(positionOnRec)
 
-        /*
+        binding.namesRecView.scrollToPosition(positionOnRec)
+
+
         binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -220,18 +176,19 @@ class NamesListFragment : Fragment() {
                 editor.apply()
             }
         })
-*/
+
 
         return view // create the view hierarchy associated with the fragment.
     }
 
-/*
+
     override fun onResume() {
         super.onResume()
         loadData()
         binding.namesRecView.scrollToPosition(positionOnRec)
     }
-*/
+    /*
+
 override fun onPause() {
     super.onPause()
     val scrollState = binding.namesRecView.layoutManager?.onSaveInstanceState()
@@ -244,7 +201,7 @@ override fun onPause() {
         sharedPreferences.edit().putString("scroll_state", encoded).apply()
     }
 }
-
+*/
 
 
 
@@ -470,9 +427,10 @@ override fun onPause() {
     }
 
     private fun loadData() {
+       
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
-
+/*
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
 
@@ -485,10 +443,12 @@ override fun onPause() {
             val scrollState = RecyclerView.LayoutManager.SavedState.CREATOR.createFromParcel(parcel)
             binding.namesRecView.layoutManager?.onRestoreInstanceState(scrollState)
         }
-    }
+        
+        */
 
-        //sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
-        //positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+        sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
+        positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+    }
 
 
     override fun onDestroyView() {
