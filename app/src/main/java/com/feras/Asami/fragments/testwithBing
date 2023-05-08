@@ -33,15 +33,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 //added by Bing
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.Preferences.Key
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.datastore.preferences.core.stringPreferencesKey
+
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.Flow
+
 import kotlinx.coroutines.launch
 import android.os.Parcelable
 import android.os.Parcel
@@ -51,13 +55,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 //added by me from Google search
 
-import androidx.datastore.core.DataStore
 //fimport androidx.datastore.preferences.core.preferencesKey
 
 
 //import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
 
 //import androidx.datastore.preferences.createDataStore
 
@@ -87,8 +88,10 @@ class NamesListFragment : Fragment() {
 
     //added by Bing
     private var recPosition = 0
-    private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-    private val SORT_ORDER_KEY = preferencesKey<String>("sort_order")
+    private val dataStore: DataStore<Preferences> by requireContext().preferencesDataStore(name = "settings")
+    //private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
+    //private val SORT_ORDER_KEY = PreferencesKey("sort_order")
 
     private var mScrollY = 0
     private var scrollState: Parcelable? = null
