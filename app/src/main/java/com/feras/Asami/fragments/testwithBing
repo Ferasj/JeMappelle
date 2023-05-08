@@ -33,12 +33,33 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 //added by Bing
+import androidx.datastore.preferences.core.Preferences
+
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.Preferences.Key
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import android.os.Parcelable
 import android.os.Parcel
 import android.util.Base64
 import androidx.savedstate.SavedStateRegistryOwner
-
 import androidx.recyclerview.widget.RecyclerView
+
+//added by me from Google search
+
+import androidx.datastore.core.DataStore
+//fimport androidx.datastore.preferences.core.preferencesKey
+
+
+//import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
+
+//import androidx.datastore.preferences.createDataStore
 
 
 
@@ -63,6 +84,12 @@ class NamesListFragment : Fragment() {
     private val REC_POSITION_KEY = "recPosition"
 
     private var positionOnRec = 0
+
+    //added by Bing
+    private var recPosition = 0
+    private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+    private val SORT_ORDER_KEY = preferencesKey<String>("sort_order")
+
     private var mScrollY = 0
     private var scrollState: Parcelable? = null
 
@@ -115,6 +142,8 @@ class NamesListFragment : Fragment() {
 
         binding.namesRecView.adapter = adapter
 
+
+        /*
         //this part is responsible for the sort functionality
         sortBy.observe(viewLifecycleOwner, Observer { sortKey ->
             viewModel.getAllSortedBy(sortKey).observe(viewLifecycleOwner, Observer {
@@ -123,6 +152,19 @@ class NamesListFragment : Fragment() {
                 binding.namesRecView.scrollToPosition(positionOnRec)
             })
         })
+        */
+
+        //this part is the new part resposnible for the sort fucntion
+        lifecycleScope.launch {
+            readSortOrderFromDataStore().collect { sortOrder ->
+                viewModel.getAllSortedBy(sortOrder).observe(viewLifecycleOwner, Observer {
+                    if (binding.searchBar.text.toString() == "")
+                        adapter.data = it
+                    binding.namesRecView.scrollToPosition(recPosition)
+                })
+            }
+        }
+
 
         //this part is responsible for the search functionality
         binding.searchBar.doOnTextChanged { text, start, before, count ->
@@ -169,16 +211,42 @@ class NamesListFragment : Fragment() {
         binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+
+                recPosition += dy
+
+                /*
                 val sharedPreferences = activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
                 val currentScrollPosition = sharedPreferences.getInt(REC_POSITION_KEY, 0) + dy
                 editor.putInt(REC_POSITION_KEY, currentScrollPosition)
                 editor.apply()
+
+                 */
             }
         })
 
 
         return view // create the view hierarchy associated with the fragment.
+    }
+
+    private fun readSortOrderFromDataStore(): Flow<String> {
+        return dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { preferences ->
+                preferences[SORT_ORDER_KEY] ?: "name_asc"
+            }
+    }
+
+    private suspend fun saveSortOrderToDataStore(sortOrder: String) {
+        dataStore.edit { preferences ->
+            preferences[SORT_ORDER_KEY] = sortOrder
+        }
     }
 
 
@@ -187,6 +255,7 @@ class NamesListFragment : Fragment() {
         loadData()
         binding.namesRecView.scrollToPosition(positionOnRec)
     }
+
     /*
 
 override fun onPause() {
@@ -276,7 +345,12 @@ override fun onPause() {
                     4
                 ) else showSnackBar("Selected table is empty!")
                 R.id.sort_name_asc -> {
-                    sortBy.value = "name_asc"
+
+                    //added by Bing (should be repeated for all the remaining sortBy also
+                    lifecycleScope.launch {
+                        saveSortOrderToDataStore("name_asc")
+                    }
+                    //sortBy.value = "name_asc"
                     saveData()
                 }
                 R.id.sort_name_des -> {
@@ -427,7 +501,7 @@ override fun onPause() {
     }
 
     private fun loadData() {
-       
+
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
 /*
@@ -443,7 +517,7 @@ override fun onPause() {
             val scrollState = RecyclerView.LayoutManager.SavedState.CREATOR.createFromParcel(parcel)
             binding.namesRecView.layoutManager?.onRestoreInstanceState(scrollState)
         }
-        
+
         */
 
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
