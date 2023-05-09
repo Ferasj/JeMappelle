@@ -39,6 +39,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.core.stringPreferencesKey
+//import androidx.datastore.preferences.core.PreferencesSerializer
+//import androidx.datastore.preferences.createDataStore
+
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.catch
@@ -88,10 +91,13 @@ class NamesListFragment : Fragment() {
 
     //added by Bing
     private var recPosition = 0
-    private val dataStore: DataStore<Preferences> by requireContext().preferencesDataStore(name = "settings")
+    //private val dataStore = requireContext().createDataStore(name = "settings", serializer = PreferencesSerializer())
+    //private val dataStore: DataStore<Preferences> by requireContext().preferencesDataStore(name = "settings")
     //private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
     //private val SORT_ORDER_KEY = PreferencesKey("sort_order")
+
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     private var mScrollY = 0
     private var scrollState: Parcelable? = null
