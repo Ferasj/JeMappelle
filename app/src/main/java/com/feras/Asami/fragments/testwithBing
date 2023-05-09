@@ -39,6 +39,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 //import androidx.datastore.preferences.core.PreferencesSerializer
 //import androidx.datastore.preferences.createDataStore
 
@@ -85,7 +86,7 @@ class NamesListFragment : Fragment() {
 
     private val SHARED_PREFS = "sharedPrefs"
     private val SORT_KEY = "sortBy"
-    private val REC_POSITION_KEY = "recPosition"
+    //private val REC_POSITION_KEY = "recPosition"
 
     private var positionOnRec = 0
 
@@ -97,6 +98,7 @@ class NamesListFragment : Fragment() {
     private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
     //private val SORT_ORDER_KEY = PreferencesKey("sort_order")
 
+    private val REC_POSITION_KEY = intPreferencesKey("rec_position")
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
     private var mScrollY = 0
@@ -131,7 +133,7 @@ class NamesListFragment : Fragment() {
             name.dateAdded = getTodayDate()
             name.dateModified = getTodayDate()
             viewModel.insertName(name)
-            resetRecPosition()
+            //resetRecPosition()
             findNavController().navigate(R.id.action_namesListFragment_to_addNewNameFragment)
         }
 
@@ -221,8 +223,12 @@ class NamesListFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                recPosition += dy
+                lifecycleScope.launch {
+                    val position = readRecPositionFromDataStore()
+                    saveRecPositionToDataStore(position + dy)
+                }
 
+                //recPosition += dy
                 /*
                 val sharedPreferences = activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
@@ -235,11 +241,18 @@ class NamesListFragment : Fragment() {
         })
 
 
+
         return view // create the view hierarchy associated with the fragment.
     }
 
+    private suspend fun saveRecPositionToDataStore(position: Int) {
+        requireContext().dataStore.edit { preferences ->
+            preferences[REC_POSITION_KEY] = position
+
+        }
+    }
     private fun readSortOrderFromDataStore(): Flow<String> {
-        return dataStore.data
+        return (requireContext().dataStore).data
             .catch { exception ->
                 if (exception is IOException) {
                     emit(emptyPreferences())
@@ -253,7 +266,7 @@ class NamesListFragment : Fragment() {
     }
 
     private suspend fun saveSortOrderToDataStore(sortOrder: String) {
-        dataStore.edit { preferences ->
+        (requireContext().dataStore).edit { preferences ->
             preferences[SORT_ORDER_KEY] = sortOrder
         }
     }
@@ -306,6 +319,7 @@ override fun onPause() {
     }
 */
 
+    /*
     fun resetRecPosition(){
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
@@ -317,7 +331,7 @@ override fun onPause() {
         editor.putInt(REC_POSITION_KEY, 0)
         editor.apply()
     }
-
+*/
 
 
 // The code below is responsbile for exporting the names to a CSV file and the sorting options.
@@ -509,11 +523,23 @@ override fun onPause() {
         editor.apply()
     }
 
+    private suspend fun readRecPositionFromDataStore(): Int {
+        var recPosition = 0
+        requireContext().dataStore.data.collect { preferences ->
+            recPosition = preferences[REC_POSITION_KEY] ?: 0
+        }
+        return recPosition
+    }
+
     private fun loadData() {
 
+        lifecycleScope.launch {
+            positionOnRec = readRecPositionFromDataStore()
+        }
+/*
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
-/*
+
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
 
@@ -526,11 +552,11 @@ override fun onPause() {
             val scrollState = RecyclerView.LayoutManager.SavedState.CREATOR.createFromParcel(parcel)
             binding.namesRecView.layoutManager?.onRestoreInstanceState(scrollState)
         }
-
+        positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+        sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         */
 
-        sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
-        positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
+
     }
 
 
