@@ -49,6 +49,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+
 
 import kotlinx.coroutines.launch
 import android.os.Parcelable
@@ -56,15 +58,6 @@ import android.os.Parcel
 import android.util.Base64
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.recyclerview.widget.RecyclerView
-
-//added by me from Google search
-
-//fimport androidx.datastore.preferences.core.preferencesKey
-
-
-//import androidx.datastore.preferences.core.stringPreferencesKey
-
-//import androidx.datastore.preferences.createDataStore
 
 
 
@@ -92,18 +85,14 @@ class NamesListFragment : Fragment() {
 
     //added by Bing
     private var recPosition = 0
+    private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
     //private val dataStore = requireContext().createDataStore(name = "settings", serializer = PreferencesSerializer())
     //private val dataStore: DataStore<Preferences> by requireContext().preferencesDataStore(name = "settings")
     //private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-    private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
     //private val SORT_ORDER_KEY = PreferencesKey("sort_order")
 
     private val REC_POSITION_KEY = intPreferencesKey("rec_position")
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
-    private var mScrollY = 0
-    private var scrollState: Parcelable? = null
-
 
 
     override fun onCreateView(
@@ -113,7 +102,7 @@ class NamesListFragment : Fragment() {
         _binding = FragmentNamesListBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        //loadData()
+        loadData()
 
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
         binding.toolbarTitle.text = "Names"
@@ -216,7 +205,7 @@ class NamesListFragment : Fragment() {
         })
 
 
-        binding.namesRecView.scrollToPosition(positionOnRec)
+
 
 
         binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -240,9 +229,18 @@ class NamesListFragment : Fragment() {
             }
         })
 
-
+       // binding.namesRecView.scrollToPosition(positionOnRec)
 
         return view // create the view hierarchy associated with the fragment.
+    }
+
+
+    private suspend fun readRecPositionFromDataStore(): Int {
+        var recPosition = 0
+        requireContext().dataStore.data.collect { preferences ->
+            recPosition = preferences[REC_POSITION_KEY] ?: 0
+        }
+        return recPosition
     }
 
     private suspend fun saveRecPositionToDataStore(position: Int) {
@@ -251,6 +249,7 @@ class NamesListFragment : Fragment() {
 
         }
     }
+
     private fun readSortOrderFromDataStore(): Flow<String> {
         return (requireContext().dataStore).data
             .catch { exception ->
@@ -523,20 +522,25 @@ override fun onPause() {
         editor.apply()
     }
 
-    private suspend fun readRecPositionFromDataStore(): Int {
-        var recPosition = 0
-        requireContext().dataStore.data.collect { preferences ->
-            recPosition = preferences[REC_POSITION_KEY] ?: 0
-        }
-        return recPosition
-    }
+
 
     private fun loadData() {
 
         lifecycleScope.launch {
             positionOnRec = readRecPositionFromDataStore()
         }
+
+        lifecycleScope.launch {
+            try {
+                val sortOrder = readSortOrderFromDataStore().first()
+                saveSortOrderToDataStore(sortOrder)
+            } catch (e: Exception) {
+                saveSortOrderToDataStore("name_asc")
+            }
+
+        }
 /*
+
         val sharedPreferences =
             this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
 
