@@ -32,34 +32,6 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-//added by Bing
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-//import androidx.datastore.preferences.core.PreferencesSerializer
-//import androidx.datastore.preferences.createDataStore
-
-
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
-
-
-import kotlinx.coroutines.launch
-import android.os.Parcelable
-import android.os.Parcel
-import android.util.Base64
-import androidx.savedstate.SavedStateRegistryOwner
-import androidx.recyclerview.widget.RecyclerView
-
-
 
 class NamesListFragment : Fragment() {
     private var _binding: FragmentNamesListBinding? = null
@@ -79,21 +51,9 @@ class NamesListFragment : Fragment() {
 
     private val SHARED_PREFS = "sharedPrefs"
     private val SORT_KEY = "sortBy"
-    //private val REC_POSITION_KEY = "recPosition"
+    private val REC_POSITION_KEY = "recPosition"
 
     private var positionOnRec = 0
-
-    //added by Bing
-    private var recPosition = 0
-    private val SORT_ORDER_KEY = stringPreferencesKey("sort_order")
-    //private val dataStore = requireContext().createDataStore(name = "settings", serializer = PreferencesSerializer())
-    //private val dataStore: DataStore<Preferences> by requireContext().preferencesDataStore(name = "settings")
-    //private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-    //private val SORT_ORDER_KEY = PreferencesKey("sort_order")
-
-    private val REC_POSITION_KEY = intPreferencesKey("rec_position")
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -122,7 +82,7 @@ class NamesListFragment : Fragment() {
             name.dateAdded = getTodayDate()
             name.dateModified = getTodayDate()
             viewModel.insertName(name)
-            //resetRecPosition()
+            resetRecPosition()
             findNavController().navigate(R.id.action_namesListFragment_to_addNewNameFragment)
         }
 
@@ -142,9 +102,6 @@ class NamesListFragment : Fragment() {
 
         binding.namesRecView.adapter = adapter
 
-
-        /*
-        //this part is responsible for the sort functionality
         sortBy.observe(viewLifecycleOwner, Observer { sortKey ->
             viewModel.getAllSortedBy(sortKey).observe(viewLifecycleOwner, Observer {
                 if (binding.searchBar.text.toString() == "")
@@ -152,21 +109,8 @@ class NamesListFragment : Fragment() {
                 binding.namesRecView.scrollToPosition(positionOnRec)
             })
         })
-        */
-
-        //this part is the new part resposnible for the sort fucntion
-        lifecycleScope.launch {
-            readSortOrderFromDataStore().collect { sortOrder ->
-                viewModel.getAllSortedBy(sortOrder).observe(viewLifecycleOwner, Observer {
-                    if (binding.searchBar.text.toString() == "")
-                        adapter.data = it
-                    binding.namesRecView.scrollToPosition(recPosition)
-                })
-            }
-        }
 
 
-        //this part is responsible for the search functionality
         binding.searchBar.doOnTextChanged { text, start, before, count ->
             if (text != null && text.isNotEmpty()) {
                 viewModel.searchNamesByKeyword(text.toString())
@@ -185,7 +129,51 @@ class NamesListFragment : Fragment() {
             }
 
 
+/*
+        binding.searchBar.doOnTextChanged { text, start, before, count ->
+            if (text != null) {
+                if (text != "") {
+                    if (text.length > 0) {
+                        viewModel.searchName(text.toString())
+                            .observe(viewLifecycleOwner, Observer { first ->
+                                viewModel.searchNameWithTag(text.toString())
+                                    .observe(viewLifecycleOwner, Observer { second ->
+                                        viewModel.format(first, second)
+                                            .observe(viewLifecycleOwner, Observer {third->
+                                                viewModel.checkForStart(third, text.toString())
+                                                    .observe(viewLifecycleOwner, Observer {
 
+                                                        val listOne : MutableList<NameWithTags> = it as MutableList<NameWithTags>
+                                                        val listTwo : MutableList<NameWithTags> = first as MutableList<NameWithTags>
+
+                                                        val listToShow = listOne
+                                                        listToShow.addAll(listTwo)
+
+                                                        adapter.data = listToShow
+                                                        binding.namesRecView.scrollToPosition(positionOnRec)
+
+                                                    })
+
+                                            })
+                                    })
+
+                            })
+                    }
+
+
+
+                    if (binding.searchBar.text.toString().isEmpty()) {
+                        viewModel.getAllSortedBy(sortBy.value!!)
+                            .observe(viewLifecycleOwner, Observer {
+                                adapter.data = it
+                                binding.namesRecView.scrollToPosition(positionOnRec)
+                            })
+                    }
+                }
+
+            }
+        }
+*/
 
         viewModel.namesWithTags.observe(viewLifecycleOwner, Observer {
             listOfNamesWithTags = it
@@ -204,102 +192,11 @@ class NamesListFragment : Fragment() {
             listOfRelationships = it
         })
 
-
-
-
-
-        binding.namesRecView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                lifecycleScope.launch {
-                    val position = readRecPositionFromDataStore()
-                    saveRecPositionToDataStore(position + dy)
-                }
-
-                //recPosition += dy
-                /*
-                val sharedPreferences = activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
-                val editor = sharedPreferences.edit()
-                val currentScrollPosition = sharedPreferences.getInt(REC_POSITION_KEY, 0) + dy
-                editor.putInt(REC_POSITION_KEY, currentScrollPosition)
-                editor.apply()
-
-                 */
-            }
-        })
-
-       // binding.namesRecView.scrollToPosition(positionOnRec)
-
-        return view // create the view hierarchy associated with the fragment.
-    }
-
-
-    private suspend fun readRecPositionFromDataStore(): Int {
-        var recPosition = 0
-        requireContext().dataStore.data.collect { preferences ->
-            recPosition = preferences[REC_POSITION_KEY] ?: 0
-        }
-        return recPosition
-    }
-
-    private suspend fun saveRecPositionToDataStore(position: Int) {
-        requireContext().dataStore.edit { preferences ->
-            preferences[REC_POSITION_KEY] = position
-
-        }
-    }
-
-    private fun readSortOrderFromDataStore(): Flow<String> {
-        return (requireContext().dataStore).data
-            .catch { exception ->
-                if (exception is IOException) {
-                    emit(emptyPreferences())
-                } else {
-                    throw exception
-                }
-            }
-            .map { preferences ->
-                preferences[SORT_ORDER_KEY] ?: "name_asc"
-            }
-    }
-
-    private suspend fun saveSortOrderToDataStore(sortOrder: String) {
-        (requireContext().dataStore).edit { preferences ->
-            preferences[SORT_ORDER_KEY] = sortOrder
-        }
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        loadData()
         binding.namesRecView.scrollToPosition(positionOnRec)
+
+        return view
     }
 
-    /*
-
-override fun onPause() {
-    super.onPause()
-    val scrollState = binding.namesRecView.layoutManager?.onSaveInstanceState()
-    if (scrollState != null) {
-        val parcel = Parcel.obtain()
-        scrollState.writeToParcel(parcel, 0)
-        val bytes = parcel.marshall()
-        val encoded = Base64.encodeToString(bytes, 0)
-        val sharedPreferences = requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("scroll_state", encoded).apply()
-    }
-}
-*/
-
-
-
-
-
-
-
-/*
     override fun onPause() {
         saveRecPosition()
         super.onPause()
@@ -316,12 +213,10 @@ override fun onPause() {
         editor.putInt(REC_POSITION_KEY, position)
         editor.apply()
     }
-*/
 
-    /*
     fun resetRecPosition(){
         val sharedPreferences =
-            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         val position =
@@ -330,18 +225,11 @@ override fun onPause() {
         editor.putInt(REC_POSITION_KEY, 0)
         editor.apply()
     }
-*/
-
-
-// The code below is responsbile for exporting the names to a CSV file and the sorting options.
-    // I don't think the code is correct anyway, as there is no value in exporting names alone or tags alone. I need the full database
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_toolbar, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -367,12 +255,7 @@ override fun onPause() {
                     4
                 ) else showSnackBar("Selected table is empty!")
                 R.id.sort_name_asc -> {
-
-                    //added by Bing (should be repeated for all the remaining sortBy also
-                    lifecycleScope.launch {
-                        saveSortOrderToDataStore("name_asc")
-                    }
-                    //sortBy.value = "name_asc"
+                    sortBy.value = "name_asc"
                     saveData()
                 }
                 R.id.sort_name_des -> {
@@ -393,7 +276,6 @@ override fun onPause() {
         return super.onOptionsItemSelected(item)
     }
 
-
     private fun exportDatabaseToCSVFile(actionId: Int) {
         var fileName = "name" + fileType
         if (actionId == 1) {
@@ -405,10 +287,10 @@ override fun onPause() {
         } else if (actionId == 4) {
             fileName = "RelationshipCSV" + fileType
         }
-        val csvFile = generateFile(requireContext(), fileName)
+        val csvFile = generateFile(context!!, fileName)
         if (csvFile != null) {
             exportNamesToCSVFile(csvFile, actionId)
-            val intent = goToFileIntent(requireContext(), csvFile)
+            val intent = goToFileIntent(context!!, csvFile)
             try {
                 if (openFileAfterExport) {
                     startActivity(intent)
@@ -501,8 +383,8 @@ override fun onPause() {
     }
 
     fun showSnackBar(message: String) {
-        Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
-            .setBackgroundTint(ContextCompat.getColor(this.requireContext(), R.color.blue_dark_700))
+        Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT)
+            .setBackgroundTint(ContextCompat.getColor(this.context!!, R.color.blue_dark_700))
             .show()
     }
 
@@ -515,59 +397,23 @@ override fun onPause() {
 
     private fun saveData() {
         val sharedPreferences =
-            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
+            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
 
         editor.putString(SORT_KEY, sortBy.value)
         editor.apply()
     }
 
-
-
     private fun loadData() {
-
-        lifecycleScope.launch {
-            positionOnRec = readRecPositionFromDataStore()
-        }
-
-        lifecycleScope.launch {
-            try {
-                val sortOrder = readSortOrderFromDataStore().first()
-                saveSortOrderToDataStore(sortOrder)
-            } catch (e: Exception) {
-                saveSortOrderToDataStore("name_asc")
-            }
-
-        }
-/*
-
         val sharedPreferences =
-            this.requireActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
-
+            this.activity!!.getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE)
         sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
         positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
-
-        val encoded = sharedPreferences.getString("scroll_state", null)
-        if (encoded != null) {
-            val bytes = Base64.decode(encoded, 0)
-            val parcel = Parcel.obtain()
-            parcel.unmarshall(bytes, 0, bytes.size)
-            parcel.setDataPosition(0)
-            val scrollState = RecyclerView.LayoutManager.SavedState.CREATOR.createFromParcel(parcel)
-            binding.namesRecView.layoutManager?.onRestoreInstanceState(scrollState)
-        }
-        positionOnRec = sharedPreferences.getInt(REC_POSITION_KEY, 0)
-        sortBy.postValue(sharedPreferences.getString(SORT_KEY, "name_asc"))
-        */
-
-
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
-        //tryin this to see if it would fix the recyclerview beign reset to zero
-        // resetRecPosition()
+        resetRecPosition()
         _binding = null
     }
 
